@@ -14,11 +14,11 @@ pub enum Card {
 pub struct NonJokerCard { suit: Suit, rank: CardRank }
 
 impl NonJokerCard {
-    pub fn suit(&self) -> Suit {
+    pub fn suit(self) -> Suit {
         self.suit
     }
 
-    pub fn rank(&self) -> CardRank {
+    pub fn rank(self) -> CardRank {
         self.rank
     }
 }

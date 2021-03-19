@@ -22,14 +22,14 @@ impl Suit {
         ]
     }
 
-    pub fn color(&self) -> SuitColor {
+    pub fn color(self) -> SuitColor {
         match self {
             Suit::Club | Suit::Spade => SuitColor::Black,
             Suit::Diamond | Suit::Heart => SuitColor::Red,
         }
     }
 
-    pub fn to_char(&self) -> char {
+    pub fn to_char(self) -> char {
         match self {
             Suit::Club => '\u{2663}',
             Suit::Spade => '\u{2660}',

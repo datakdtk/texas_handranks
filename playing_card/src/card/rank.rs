@@ -43,7 +43,7 @@ impl CardRank {
         ]
     }
 
-    pub fn to_int(&self) -> u8 {
+    pub fn to_int(self) -> u8 {
         match self {
             Self::Ace => 1,
             Self::King => 13,
@@ -53,7 +53,7 @@ impl CardRank {
         }
     }
 
-    pub fn to_char(&self) -> char {
+    pub fn to_char(self) -> char {
         match self {
             Self::Ace => 'A',
             Self::King => 'K',
@@ -61,6 +61,20 @@ impl CardRank {
             Self::Jack => 'J',
             Self::Number(n) if n.value == 10 => 'T',
             Self::Number(n) => char::from_digit(n.value as u32, 10).unwrap(),
+        }
+    }
+
+    pub fn is_ace(self) -> bool {
+        match self {
+            CardRank::Ace => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_picture_card(self) -> bool {
+        match self {
+            Self::King | Self::Queen | Self::Jack => true,
+            _ => false,
         }
     }
 }
@@ -229,5 +243,63 @@ mod test {
         let expected: Vec<u8> = (1 ..= 13).collect();
         let actual: Vec<u8> = CardRank::all().iter().map(|r| r.to_int()).collect();
         assert_eq!(expected, actual);
+    }
+
+    #[test]
+    fn ace_is_ace() {
+        assert!(CardRank::Ace.is_ace())
+    }
+
+    #[test]
+    fn king_is_not_ace() {
+        assert!(!CardRank::King.is_ace())
+    }
+
+    #[test]
+    fn rank_10_is_not_ace() {
+        let n = 10;
+        let rank = CardRank::Number(CardRankNumber { value: n });
+        assert!(!rank.is_ace());
+    }
+
+    #[test]
+    fn rank_2_is_not_ace() {
+        let n = 2;
+        let rank = CardRank::Number(CardRankNumber { value: n });
+        assert!(!rank.is_ace());
+    }
+
+    #[test]
+    fn ace_is_not_picture_card() {
+        assert!(!CardRank::Ace.is_picture_card())
+    }
+
+    #[test]
+    fn king_is_picture_card() {
+        assert!(CardRank::King.is_picture_card())
+    }
+
+    #[test]
+    fn queen_is_picture_card() {
+        assert!(CardRank::Queen.is_picture_card())
+    }
+
+    #[test]
+    fn jack_is_picture_card() {
+        assert!(CardRank::Jack.is_picture_card())
+    }
+
+    #[test]
+    fn rank_10_is_not_picture_card() {
+        let n = 2;
+        let rank = CardRank::Number(CardRankNumber { value: n });
+        assert!(!rank.is_picture_card());
+    }
+
+    #[test]
+    fn rank_2_is_not_picture_card() {
+        let n = 2;
+        let rank = CardRank::Number(CardRankNumber { value: n });
+        assert!(!rank.is_picture_card());
     }
 }
