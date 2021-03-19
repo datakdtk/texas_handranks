@@ -1,10 +1,14 @@
-pub mod card;
+mod suit;
+mod rank;
 
+pub use suit::*;
+pub use rank::*;
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+pub enum Card {
+    Joker,
+    Other(NonJokerCard),
 }
+
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+pub struct NonJokerCard { pub suit: Suit, pub rank: CardRank }

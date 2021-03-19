@@ -1,9 +1,9 @@
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum Suit {
     Spade,
-    Club,
     Diamond,
     Heart,
+    Club,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -13,6 +13,15 @@ pub enum SuitColor {
 }
 
 impl Suit {
+    pub fn all() -> [Suit; 4] {
+        [
+            Suit::Spade,
+            Suit::Diamond,
+            Suit::Heart,
+            Suit::Club,
+        ]
+    }
+
     pub fn color(&self) -> SuitColor {
         match self {
             Suit::Club | Suit::Spade => SuitColor::Black,
