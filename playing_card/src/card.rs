@@ -11,7 +11,17 @@ pub enum Card {
 }
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
-pub struct NonJokerCard { pub suit: Suit, pub rank: CardRank }
+pub struct NonJokerCard { suit: Suit, rank: CardRank }
+
+impl NonJokerCard {
+    pub fn suit(&self) -> Suit {
+        self.suit
+    }
+
+    pub fn rank(&self) -> CardRank {
+        self.rank
+    }
+}
 
 pub fn all_non_joker_card() -> Vec<NonJokerCard> {
     Suit::all().iter().flat_map(|suit| {
