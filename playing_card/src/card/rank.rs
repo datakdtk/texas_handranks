@@ -1,7 +1,7 @@
 use std::fmt;
 use std::char;
 
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
 pub enum CardRank {
     Ace,
     King,
@@ -10,7 +10,7 @@ pub enum CardRank {
     Number(CardRankNumber),
 }
 
-#[derive(Debug, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
 pub struct CardRankNumber { value: u8 }
 
 impl CardRank {
