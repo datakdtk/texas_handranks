@@ -1,5 +1,8 @@
+extern crate rand;
+
 mod suit;
 mod rank;
+pub mod deck;
 
 pub use suit::*;
 pub use rank::*;
