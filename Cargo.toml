@@ -1,4 +1,5 @@
 [workspace]
 members = [
   "playing_card",
+  "texas_holdem",
 ]
