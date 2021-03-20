@@ -14,6 +14,10 @@ pub enum Card {
 pub struct NonJokerCard { suit: Suit, rank: CardRank }
 
 impl NonJokerCard {
+    pub fn new(suit: Suit, rank: CardRank) -> Self {
+        Self { suit, rank }
+    }
+
     pub fn suit(self) -> Suit {
         self.suit
     }
