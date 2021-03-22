@@ -16,6 +16,7 @@ pub fn cmp_card_ranks(a: CardRank, b: CardRank) -> Ordering {
     }
 }
 
+/// Card that can be compared by poker rank order.
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash)]
 pub struct PokerCard(NonJokerCard);
 
