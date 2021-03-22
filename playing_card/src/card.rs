@@ -1,6 +1,7 @@
 mod suit;
 mod rank;
 
+use std::fmt;
 pub use suit::*;
 pub use rank::*;
 
@@ -24,6 +25,12 @@ impl NonJokerCard {
 
     pub fn rank(self) -> CardRank {
         self.rank
+    }
+}
+
+impl fmt::Display for NonJokerCard {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}{}", self.suit().to_char(), self.rank().to_char())
     }
 }
 
