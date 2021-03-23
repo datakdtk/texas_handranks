@@ -326,7 +326,7 @@ mod test {
 
     #[test]
     fn ace_and_2_is_connector() {
-        let a = NonJokerCard::new(Suit::Club, CardRank::new(2).unwrap());
+        let a = NonJokerCard::new(Suit::Club, CardRank::new(2));
         let b = NonJokerCard::new(Suit::Heart, CardRank::Ace);
         let hand = StartingHand::new(a, b);
         assert!(hand.is_connector())
@@ -401,7 +401,7 @@ mod test {
     #[test]
     fn king_and_2_is_not_one_gapper() {
         let a = NonJokerCard::new(Suit::Heart, CardRank::King);
-        let b = NonJokerCard::new(Suit::Heart, CardRank::new(2).unwrap());
+        let b = NonJokerCard::new(Suit::Heart, CardRank::new(2));
         let hand = StartingHand::new(a, b);
         assert!(!hand.is_one_gapper())
     }
@@ -409,7 +409,7 @@ mod test {
     #[test]
     fn ace_and_3_is_one_gapper() {
         let a = NonJokerCard::new(Suit::Heart, CardRank::Ace);
-        let b = NonJokerCard::new(Suit::Heart, CardRank::new(3).unwrap());
+        let b = NonJokerCard::new(Suit::Heart, CardRank::new(3));
         let hand = StartingHand::new(a, b);
         assert!(hand.is_one_gapper())
     }

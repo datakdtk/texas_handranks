@@ -14,32 +14,32 @@ pub enum CardRank {
 pub struct CardRankNumber { value: u8 }
 
 impl CardRank {
-    pub fn new(value: u8) -> Result<Self, String> {
+    pub fn new(value: u8) -> Self {
         match value {
-            1 => Ok(CardRank::Ace),
-            13 => Ok(CardRank::King),
-            12 => Ok(CardRank::Queen),
-            11 => Ok(CardRank::Jack),
-            2 ..= 10 => Ok(CardRank::Number(CardRankNumber {value})),
-            _ => Err("Argument is out of range".to_string()),
+            1 => CardRank::Ace,
+            13 => CardRank::King,
+            12 => CardRank::Queen,
+            11 => CardRank::Jack,
+            2 ..= 10 => CardRank::Number(CardRankNumber {value}),
+            _ => panic!("Argument is out of range".to_string()),
         }
     }
 
     pub fn all() -> [Self; 13] {
         [ 
-            Self::new(1).unwrap(),
-            Self::new(2).unwrap(),
-            Self::new(3).unwrap(),
-            Self::new(4).unwrap(),
-            Self::new(5).unwrap(),
-            Self::new(6).unwrap(),
-            Self::new(7).unwrap(),
-            Self::new(8).unwrap(),
-            Self::new(9).unwrap(),
-            Self::new(10).unwrap(),
-            Self::new(11).unwrap(),
-            Self::new(12).unwrap(),
-            Self::new(13).unwrap(),
+            Self::new(1),
+            Self::new(2),
+            Self::new(3),
+            Self::new(4),
+            Self::new(5),
+            Self::new(6),
+            Self::new(7),
+            Self::new(8),
+            Self::new(9),
+            Self::new(10),
+            Self::new(11),
+            Self::new(12),
+            Self::new(13),
         ]
     }
 
@@ -94,29 +94,29 @@ mod test {
 
     #[test]
     fn ace_is_created_from_1() {
-        assert_eq!(CardRank::new(1).unwrap(), CardRank::Ace);
+        assert_eq!(CardRank::new(1), CardRank::Ace);
     }
 
     #[test]
     fn king_is_created_from_13() {
-        assert_eq!(CardRank::new(13).unwrap(), CardRank::King);
+        assert_eq!(CardRank::new(13), CardRank::King);
     }
 
     #[test]
     fn queen_is_created_from_12() {
-        assert_eq!(CardRank::new(12).unwrap(), CardRank::Queen);
+        assert_eq!(CardRank::new(12), CardRank::Queen);
     }
 
     #[test]
     fn jack_is_created_from_11() {
-        assert_eq!(CardRank::new(11).unwrap(), CardRank::Jack);
+        assert_eq!(CardRank::new(11), CardRank::Jack);
     }
 
     #[test]
     fn rank_can_create_from_10() {
         assert_eq!(
             CardRank::Number(CardRankNumber{ value: 10 }),
-            CardRank::new(10).unwrap(),
+            CardRank::new(10),
         );
     }
 
@@ -124,18 +124,20 @@ mod test {
     fn rank_can_create_from_2() {
         assert_eq!(
             CardRank::Number(CardRankNumber{ value: 2 }),
-            CardRank::new(2).unwrap(),
+            CardRank::new(2),
         );
     }
 
     #[test]
+    #[should_panic(expected = "out of range")]
     fn rank_can_not_create_from_0() {
-        assert!(!CardRank::new(0).is_ok());
+        CardRank::new(0);
     }
 
     #[test]
+    #[should_panic(expected = "out of range")]
     fn rank_can_not_create_from_14() {
-        assert!(!CardRank::new(14).is_ok());
+        CardRank::new(14);
     }
 
     #[test]

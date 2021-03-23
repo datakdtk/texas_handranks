@@ -93,16 +93,16 @@ mod test {
         let ranks_a = [
             CardRank::King,
             CardRank::Jack,
-            CardRank::new(9).unwrap(),
-            CardRank::new(7).unwrap(),
-            CardRank::new(5).unwrap(),
+            CardRank::new(9),
+            CardRank::new(7),
+            CardRank::new(5),
         ];
         let ranks_b = [
             CardRank::Ace,
             CardRank::Queen,
-            CardRank::new(10).unwrap(),
-            CardRank::new(8).unwrap(),
-            CardRank::new(6).unwrap(),
+            CardRank::new(10),
+            CardRank::new(8),
+            CardRank::new(6),
         ];
 
         let a = HandValue{ hand_rank: HandRank::Flush, card_ranks: ranks_a };
@@ -114,18 +114,18 @@ mod test {
     #[test]
     fn hand_values_of_same_rank_are_compared_by_highest_card_rank() {
         let ranks_a = [
-            CardRank::new(7).unwrap(),
-            CardRank::new(6).unwrap(),
-            CardRank::new(5).unwrap(),
-            CardRank::new(4).unwrap(),
-            CardRank::new(3).unwrap(),
+            CardRank::new(7),
+            CardRank::new(6),
+            CardRank::new(5),
+            CardRank::new(4),
+            CardRank::new(3),
         ];
         let ranks_b = [
             CardRank::Ace,
-            CardRank::new(5).unwrap(),
-            CardRank::new(4).unwrap(),
-            CardRank::new(3).unwrap(),
-            CardRank::new(2).unwrap(),
+            CardRank::new(5),
+            CardRank::new(4),
+            CardRank::new(3),
+            CardRank::new(2),
         ];
 
         let a = HandValue{ hand_rank: HandRank::Flush, card_ranks: ranks_a };
@@ -138,17 +138,17 @@ mod test {
     fn hand_values_of_same_rank_can_be_compared_by_second_highest_card_rank() {
         let ranks_a = [
             CardRank::Ace,
-            CardRank::new(6).unwrap(),
-            CardRank::new(5).unwrap(),
-            CardRank::new(4).unwrap(),
-            CardRank::new(3).unwrap(),
+            CardRank::new(6),
+            CardRank::new(5),
+            CardRank::new(4),
+            CardRank::new(3),
         ];
         let ranks_b = [
             CardRank::Ace,
             CardRank::King,
-            CardRank::new(4).unwrap(),
-            CardRank::new(3).unwrap(),
-            CardRank::new(2).unwrap(),
+            CardRank::new(4),
+            CardRank::new(3),
+            CardRank::new(2),
         ];
 
         let a = HandValue{ hand_rank: HandRank::Flush, card_ranks: ranks_a };
@@ -162,16 +162,16 @@ mod test {
         let ranks_a = [
             CardRank::Ace,
             CardRank::King,
-            CardRank::new(5).unwrap(),
-            CardRank::new(4).unwrap(),
-            CardRank::new(3).unwrap(),
+            CardRank::new(5),
+            CardRank::new(4),
+            CardRank::new(3),
         ];
         let ranks_b = [
             CardRank::Ace,
             CardRank::King,
             CardRank::Queen,
-            CardRank::new(3).unwrap(),
-            CardRank::new(2).unwrap(),
+            CardRank::new(3),
+            CardRank::new(2),
         ];
 
         let a = HandValue{ hand_rank: HandRank::Flush, card_ranks: ranks_a };
@@ -186,15 +186,15 @@ mod test {
             CardRank::Ace,
             CardRank::King,
             CardRank::Queen,
-            CardRank::new(4).unwrap(),
-            CardRank::new(3).unwrap(),
+            CardRank::new(4),
+            CardRank::new(3),
         ];
         let ranks_b = [
             CardRank::Ace,
             CardRank::King,
             CardRank::Queen,
             CardRank::Jack,
-            CardRank::new(2).unwrap(),
+            CardRank::new(2),
         ];
 
         let a = HandValue{ hand_rank: HandRank::Flush, card_ranks: ranks_a };
@@ -210,14 +210,14 @@ mod test {
             CardRank::King,
             CardRank::Queen,
             CardRank::Jack,
-            CardRank::new(3).unwrap(),
+            CardRank::new(3),
         ];
         let ranks_b = [
             CardRank::Ace,
             CardRank::King,
             CardRank::Queen,
             CardRank::Jack,
-            CardRank::new(2).unwrap(),
+            CardRank::new(2),
         ];
 
         let a = HandValue{ hand_rank: HandRank::Flush, card_ranks: ranks_a };
@@ -233,7 +233,7 @@ mod test {
             CardRank::King,
             CardRank::Queen,
             CardRank::Jack,
-            CardRank::new(2).unwrap(),
+            CardRank::new(2),
         ];
 
         let a = HandValue{ hand_rank: HandRank::Flush, card_ranks: ranks };

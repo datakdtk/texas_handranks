@@ -115,7 +115,7 @@ impl StraightCounter {
 
         let connecting_rank = match self.previous_rank {
             Some(CardRank::Ace) if self.current_head == Some(CardRank::Ace) => CardRank::King,
-            Some(x) if x != CardRank::Ace => CardRank::new(x.to_int() - 1).unwrap(),
+            Some(x) if x != CardRank::Ace => CardRank::new(x.to_int() - 1),
             _ => return, // Sequence can not get longer
         };
 
@@ -134,17 +134,17 @@ impl StraightCounter {
         // A straight sequence is completed. Save current_head and update current_head and current_count.
         if self.current_count >= 5 {
             assert_eq!(5, self.current_count);
-            self.determined_heads.push(self.current_head.unwrap());
+            self.determined_heads.push(self.current_head.expect("current_head_is_missing"));
             self.current_head = match self.current_head {
                 Some(CardRank::Ace) => Some(CardRank::King),
-                Some(x) if x.to_int() > 2 => Some(CardRank::new(x.to_int() - 1).unwrap()),
+                Some(x) if x.to_int() > 2 => Some(CardRank::new(x.to_int() - 1)),
                 x => panic!(format!("current_head is unexpected value when completing straight: {:?}", x)),
             };
             self.current_count = 4;
         }
 
         // Complete 5 to ace straight if current sequence is from 5 to 2
-        let head_five = CardRank::new(5).unwrap();
+        let head_five = CardRank::new(5);
         if self.current_head == Some(head_five) && self.current_count == 4 && self.has_ace {
             self.determined_heads.push(head_five);
             self.current_count = 0; // never expected to be counted up later.
@@ -177,14 +177,14 @@ mod test {
     #[should_panic(expected = "number of cards")]
     fn should_panic_when_8_cards_are_given() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(1).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(3).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(6).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(7).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(8).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(1)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(3)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(5)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(6)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(7)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(8)),
         ];
         TotalHand::new(&cards); // Be panic!
     }
@@ -192,19 +192,19 @@ mod test {
     #[test]
     fn cards_should_get_sorted_in_descending_order() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(10).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(7).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(9).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(10)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(7)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(9)),
         ];
         let hand = TotalHand::new(&cards);
         let sorted = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(10).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(9).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(7).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(2).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(10)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(9)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(7)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
         ];
         assert_eq!(sorted, hand.cards());
     }
@@ -212,15 +212,15 @@ mod test {
     #[test]
     fn can_detect_one_pair() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(9).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(9)),
         ];
         let hand = TotalHand::new(&cards);
         let expected = vec![
-            CardRank::new(13).unwrap(),
+            CardRank::new(13),
         ];
         assert_eq!(expected, hand.ranks_of_pairs());
     }
@@ -228,16 +228,16 @@ mod test {
     #[test]
     fn can_detect_two_pairs() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(9).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(9).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(9)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(9)),
         ];
         let hand = TotalHand::new(&cards);
         let expected = vec![
-            CardRank::new(13).unwrap(),
-            CardRank::new(9).unwrap(),
+            CardRank::new(13),
+            CardRank::new(9),
         ];
         assert_eq!(expected, hand.ranks_of_pairs());
     }
@@ -245,11 +245,11 @@ mod test {
     #[test]
     fn set_is_not_pair() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(9).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(13).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(9)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(13)),
         ];
         let hand = TotalHand::new(&cards);
         let expected:Vec<CardRank> = vec![
@@ -260,15 +260,15 @@ mod test {
     #[test]
     fn can_detect_one_set() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(13).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(13)),
         ];
         let hand = TotalHand::new(&cards);
         let expected = vec![
-            CardRank::new(13).unwrap(),
+            CardRank::new(13),
         ];
         assert_eq!(expected, hand.ranks_of_sets());
     }
@@ -276,18 +276,18 @@ mod test {
     #[test]
     fn can_detect_two_sets() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(13)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(4)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(13)),
+            NonJokerCard::new(Suit::Club, CardRank::new(4)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
         ];
         let hand = TotalHand::new(&cards);
         let expected = vec![
-            CardRank::new(13).unwrap(),
-            CardRank::new(4).unwrap(),
+            CardRank::new(13),
+            CardRank::new(4),
         ];
         assert_eq!(expected, hand.ranks_of_sets());
     }
@@ -295,13 +295,13 @@ mod test {
     #[test]
     fn quads_is_not_sets() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(4).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(13)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(13)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(4)),
         ];
         let hand = TotalHand::new(&cards);
         let expected:Vec<CardRank> = vec![
@@ -312,27 +312,27 @@ mod test {
     #[test]
     fn can_detect_quads() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(4).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(13)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(13)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(4)),
         ];
         let hand = TotalHand::new(&cards);
-        assert_eq!(Some(CardRank::new(13).unwrap()), hand.rank_of_quads());
+        assert_eq!(Some(CardRank::new(13)), hand.rank_of_quads());
     }
 
     #[test]
     fn none_is_returned_when_no_quads() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(4).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(13)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(13)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(4)),
         ];
         let hand = TotalHand::new(&cards);
         assert_eq!(None, hand.rank_of_quads());
@@ -341,13 +341,13 @@ mod test {
     #[test]
     fn can_detect_flush() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(3).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(13)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(4)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(5)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(3)),
         ];
         let hand = TotalHand::new(&cards);
         assert_eq!(Some(Suit::Heart), hand.suit_of_flush());
@@ -356,12 +356,12 @@ mod test {
     #[test]
     fn none_is_returned_when_no_flush() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(4).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(13)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(13)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(4)),
         ];
         let hand = TotalHand::new(&cards);
         assert_eq!(None, hand.suit_of_flush());
@@ -370,12 +370,12 @@ mod test {
     #[test]
     fn four_cards_are_not_straight() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(3).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(4).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(3)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(5)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(4)),
         ];
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
@@ -386,15 +386,15 @@ mod test {
     #[test]
     fn straight_of_exactly_five_cards() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(3).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(6).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(3)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(5)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(6)),
         ];
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
-            CardRank::new(6).unwrap(),
+            CardRank::new(6),
         ];
         assert_eq!(expected, hand.head_ranks_of_straight());
     }
@@ -402,16 +402,16 @@ mod test {
     #[test]
     fn straight_with_extra_card_higher_than_top() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(7).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(8).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(6).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(10).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(7)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(8)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(5)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(6)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(10)),
         ];
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
-            CardRank::new(8).unwrap(),
+            CardRank::new(8),
         ];
         assert_eq!(expected, hand.head_ranks_of_straight());
     }
@@ -419,16 +419,16 @@ mod test {
     #[test]
     fn straight_with_extra_card_lower_than_tail() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(7).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(8).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(6).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(2).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(7)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(8)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(5)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(6)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
         ];
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
-            CardRank::new(8).unwrap(),
+            CardRank::new(8),
         ];
         assert_eq!(expected, hand.head_ranks_of_straight());
     }
@@ -436,17 +436,17 @@ mod test {
     #[test]
     fn straight_with_higher_and_lower_extra_cards() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(7).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(8).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(6).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(10).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(7)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(8)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(5)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(6)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(10)),
         ];
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
-            CardRank::new(8).unwrap(),
+            CardRank::new(8),
         ];
         assert_eq!(expected, hand.head_ranks_of_straight());
     }
@@ -454,16 +454,16 @@ mod test {
     #[test]
     fn straight_with_duplicate_card_ranks_on_head() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(7).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(8).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(8).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(6).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(7)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(8)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(8)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(5)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(6)),
         ];
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
-            CardRank::new(8).unwrap(),
+            CardRank::new(8),
         ];
         assert_eq!(expected, hand.head_ranks_of_straight());
     }
@@ -471,16 +471,16 @@ mod test {
     #[test]
     fn straight_with_duplicate_card_ranks_on_tail() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(7).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(8).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(6).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(7)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(8)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(4)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(5)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(6)),
         ];
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
-            CardRank::new(8).unwrap(),
+            CardRank::new(8),
         ];
         assert_eq!(expected, hand.head_ranks_of_straight());
     }
@@ -488,16 +488,16 @@ mod test {
     #[test]
     fn straight_with_duplicate_card_ranks_in_middle() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(7).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(8).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(6).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(7)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(8)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(5)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(5)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(6)),
         ];
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
-            CardRank::new(8).unwrap(),
+            CardRank::new(8),
         ];
         assert_eq!(expected, hand.head_ranks_of_straight());
     }
@@ -505,17 +505,17 @@ mod test {
     #[test]
     fn straight_with_two_pairs_of_duplicate_card_ranks() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(7).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(8).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(6).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(7)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(8)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(5)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(5)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(6)),
         ];
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
-            CardRank::new(8).unwrap(),
+            CardRank::new(8),
         ];
         assert_eq!(expected, hand.head_ranks_of_straight());
     }
@@ -523,17 +523,17 @@ mod test {
     #[test]
     fn straight_with_3_duplicate_cards_ranks() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(7).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(8).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(6).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(7)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(8)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(5)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(5)),
+            NonJokerCard::new(Suit::Club, CardRank::new(5)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(6)),
         ];
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
-            CardRank::new(8).unwrap(),
+            CardRank::new(8),
         ];
         assert_eq!(expected, hand.head_ranks_of_straight());
     }
@@ -541,15 +541,15 @@ mod test {
     #[test]
     fn straight_from_ace_to_10() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(12).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(11).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(10).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(1).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(12)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(13)),
+            NonJokerCard::new(Suit::Club, CardRank::new(11)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(10)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(1)),
         ];
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
-            CardRank::new(1).unwrap(),
+            CardRank::new(1),
         ];
         assert_eq!(expected, hand.head_ranks_of_straight());
     }
@@ -557,15 +557,15 @@ mod test {
     #[test]
     fn straight_from_5_to_ace() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(3).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(1).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(5)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(3)),
+            NonJokerCard::new(Suit::Club, CardRank::new(4)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(2)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(1)),
         ];
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
-            CardRank::new(5).unwrap(),
+            CardRank::new(5),
         ];
         assert_eq!(expected, hand.head_ranks_of_straight());
     }
@@ -573,11 +573,11 @@ mod test {
     #[test]
     fn not_straight_from_5_to_ace_when_2_dropped() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(6).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(3).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(1).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(6)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(5)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(3)),
+            NonJokerCard::new(Suit::Club, CardRank::new(4)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(1)),
         ];
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
@@ -588,11 +588,11 @@ mod test {
     #[test]
     fn not_straight_from_5_to_ace_when_5_dropped() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(6).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(3).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(1).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(6)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(3)),
+            NonJokerCard::new(Suit::Club, CardRank::new(4)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(1)),
         ];
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
@@ -603,11 +603,11 @@ mod test {
     #[test]
     fn straight_cannot_get_over_ace() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(13).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(3).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(12).unwrap()),
-            NonJokerCard::new(Suit::Spade, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(1).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(3)),
+            NonJokerCard::new(Suit::Club, CardRank::new(12)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(2)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(1)),
         ];
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
@@ -618,17 +618,17 @@ mod test {
     #[test]
     fn straight_with_6_cards_sequence() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(6).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(3).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(7).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(6)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(5)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(3)),
+            NonJokerCard::new(Suit::Club, CardRank::new(4)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(2)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(7)),
         ];
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
-            CardRank::new(7).unwrap(),
-            CardRank::new(6).unwrap(),
+            CardRank::new(7),
+            CardRank::new(6),
         ];
         assert_eq!(expected, hand.head_ranks_of_straight());
     }
@@ -636,19 +636,19 @@ mod test {
     #[test]
     fn straight_with_7_cards_sequence() {
         let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(8).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(6).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(5).unwrap()),
-            NonJokerCard::new(Suit::Heart, CardRank::new(3).unwrap()),
-            NonJokerCard::new(Suit::Club, CardRank::new(4).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(2).unwrap()),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(7).unwrap()),
+            NonJokerCard::new(Suit::Heart, CardRank::new(8)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(6)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(5)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(3)),
+            NonJokerCard::new(Suit::Club, CardRank::new(4)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(2)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(7)),
         ];
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
-            CardRank::new(8).unwrap(),
-            CardRank::new(7).unwrap(),
-            CardRank::new(6).unwrap(),
+            CardRank::new(8),
+            CardRank::new(7),
+            CardRank::new(6),
         ];
         assert_eq!(expected, hand.head_ranks_of_straight());
     }

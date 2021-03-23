@@ -74,15 +74,15 @@ mod test {
             CardRank::King,
             CardRank::Queen,
             CardRank::Jack,
-            CardRank::new(10).unwrap(),
-            CardRank::new(9).unwrap(),
-            CardRank::new(8).unwrap(),
-            CardRank::new(7).unwrap(),
-            CardRank::new(6).unwrap(),
-            CardRank::new(5).unwrap(),
-            CardRank::new(4).unwrap(),
-            CardRank::new(3).unwrap(),
-            CardRank::new(2).unwrap(),
+            CardRank::new(10),
+            CardRank::new(9),
+            CardRank::new(8),
+            CardRank::new(7),
+            CardRank::new(6),
+            CardRank::new(5),
+            CardRank::new(4),
+            CardRank::new(3),
+            CardRank::new(2),
             CardRank::Ace,
         ]
     }
@@ -93,15 +93,15 @@ mod test {
         let mut ranks = get_all_ranks();
         let expected = vec![
             CardRank::Ace,
-            CardRank::new(2).unwrap(),
-            CardRank::new(3).unwrap(),
-            CardRank::new(4).unwrap(),
-            CardRank::new(5).unwrap(),
-            CardRank::new(6).unwrap(),
-            CardRank::new(7).unwrap(),
-            CardRank::new(8).unwrap(),
-            CardRank::new(9).unwrap(),
-            CardRank::new(10).unwrap(),
+            CardRank::new(2),
+            CardRank::new(3),
+            CardRank::new(4),
+            CardRank::new(5),
+            CardRank::new(6),
+            CardRank::new(7),
+            CardRank::new(8),
+            CardRank::new(9),
+            CardRank::new(10),
             CardRank::Jack,
             CardRank::Queen,
             CardRank::King,
@@ -115,15 +115,15 @@ mod test {
         let comparer = CardComparer::new(CardRank::Ace);
         let mut ranks = get_all_ranks();
         let expected = vec![
-            CardRank::new(2).unwrap(),
-            CardRank::new(3).unwrap(),
-            CardRank::new(4).unwrap(),
-            CardRank::new(5).unwrap(),
-            CardRank::new(6).unwrap(),
-            CardRank::new(7).unwrap(),
-            CardRank::new(8).unwrap(),
-            CardRank::new(9).unwrap(),
-            CardRank::new(10).unwrap(),
+            CardRank::new(2),
+            CardRank::new(3),
+            CardRank::new(4),
+            CardRank::new(5),
+            CardRank::new(6),
+            CardRank::new(7),
+            CardRank::new(8),
+            CardRank::new(9),
+            CardRank::new(10),
             CardRank::Jack,
             CardRank::Queen,
             CardRank::King,
@@ -135,22 +135,22 @@ mod test {
 
     #[test]
     fn test_rank_order_when_2_is_highest() {
-        let comparer = CardComparer::new(CardRank::new(2).unwrap());
+        let comparer = CardComparer::new(CardRank::new(2));
         let mut ranks = get_all_ranks();
         let expected = vec![
-            CardRank::new(3).unwrap(),
-            CardRank::new(4).unwrap(),
-            CardRank::new(5).unwrap(),
-            CardRank::new(6).unwrap(),
-            CardRank::new(7).unwrap(),
-            CardRank::new(8).unwrap(),
-            CardRank::new(9).unwrap(),
-            CardRank::new(10).unwrap(),
+            CardRank::new(3),
+            CardRank::new(4),
+            CardRank::new(5),
+            CardRank::new(6),
+            CardRank::new(7),
+            CardRank::new(8),
+            CardRank::new(9),
+            CardRank::new(10),
             CardRank::Jack,
             CardRank::Queen,
             CardRank::King,
             CardRank::Ace,
-            CardRank::new(2).unwrap(),
+            CardRank::new(2),
         ];
         ranks.sort_by(|a, b| comparer.cmp_card_ranks(*a, *b) );
         assert_eq!(expected, ranks);
