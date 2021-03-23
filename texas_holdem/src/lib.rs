@@ -1,8 +1,8 @@
 extern crate playing_card;
 
-mod hand;
+mod starting_hand;
+pub use starting_hand::StartingHand;
 
-pub use hand::*;
 use playing_card::cmp::CardComparer;
 use playing_card::card::CardRank;
 
