@@ -37,7 +37,7 @@ impl CardComparer {
         Ok(Self {highest_rank, suit_strengths})
     }
 
-    fn adjust_card_rank_value(&self, target: &CardRank) -> u8 {
+    fn adjust_card_rank_value(&self, target: CardRank) -> u8 {
         if target.to_int() <= self.highest_rank.to_int() {
             target.to_int() + CardRank::King.to_int()
         } else {
@@ -46,21 +46,21 @@ impl CardComparer {
     }
 
     /// Returns Ordering::Greater if former item is greater.
-    pub fn cmp_card_ranks(&self, a: &CardRank, b: &CardRank) -> Ordering {
+    pub fn cmp_card_ranks(&self, a: CardRank, b: CardRank) -> Ordering {
         self.adjust_card_rank_value(a)
             .cmp(&self.adjust_card_rank_value(b))
     }
 
     /// Returns Ordering::Greater if former item is greater.
-    pub fn cmp_suits(&self, a: &Suit, b: &Suit) -> Ordering {
-        self.suit_strengths[a].cmp(&self.suit_strengths[b])
+    pub fn cmp_suits(&self, a: Suit, b: Suit) -> Ordering {
+        self.suit_strengths[&a].cmp(&self.suit_strengths[&b])
     }
 
     /// Compare cards by their ranks at first, then by their suits.
     /// Returns Ordering::Greater if former item is greater.
-    pub fn cmp_cards(&self, a: &NonJokerCard, b: &NonJokerCard ) -> Ordering {
-        self.cmp_card_ranks(&a.rank(), &b.rank())
-            .then(self.cmp_suits(&a.suit(), &b.suit()))
+    pub fn cmp_cards(&self, a: NonJokerCard, b: NonJokerCard ) -> Ordering {
+        self.cmp_card_ranks(a.rank(), b.rank())
+            .then(self.cmp_suits(a.suit(), b.suit()))
     }
 }
 
@@ -106,7 +106,7 @@ mod test {
             CardRank::Queen,
             CardRank::King,
         ];
-        ranks.sort_by(|a, b| comparer.cmp_card_ranks(a, b) );
+        ranks.sort_by(|a, b| comparer.cmp_card_ranks(*a, *b) );
         assert_eq!(expected, ranks);
     }
 
@@ -129,7 +129,7 @@ mod test {
             CardRank::King,
             CardRank::Ace,
         ];
-        ranks.sort_by(|a, b| comparer.cmp_card_ranks(a, b) );
+        ranks.sort_by(|a, b| comparer.cmp_card_ranks(*a, *b) );
         assert_eq!(expected, ranks);
     }
 
@@ -152,7 +152,7 @@ mod test {
             CardRank::Ace,
             CardRank::new(2).unwrap(),
         ];
-        ranks.sort_by(|a, b| comparer.cmp_card_ranks(a, b) );
+        ranks.sort_by(|a, b| comparer.cmp_card_ranks(*a, *b) );
         assert_eq!(expected, ranks);
     }
 
@@ -171,7 +171,7 @@ mod test {
             Suit::Heart,
             Suit::Club,
         ];
-        target.sort_by(|a, b| comparer.cmp_suits(a, b).reverse()); // must reverse because given order is descending
+        target.sort_by(|a, b| comparer.cmp_suits(*a, *b).reverse()); // must reverse because given order is descending
         let expected: Vec<Suit> = suits_order.iter().map(|s| *s).collect();
         assert_eq!(expected, target);
     }
@@ -192,7 +192,7 @@ mod test {
             Suit::Heart,
             Suit::Club,
         ];
-        target.sort_by(|a, b| comparer.cmp_suits(a, b).reverse()); // must reverse because given order is descending
+        target.sort_by(|a, b| comparer.cmp_suits(*a, *b).reverse()); // must reverse because given order is descending
         let expected: Vec<Suit> = suits_order.iter().map(|s| *s).collect();
         assert_eq!(expected, target);
     }
@@ -223,7 +223,7 @@ mod test {
         let comparer = CardComparer::new_with_suit_order(CardRank::Ace, suits_order).expect("constructor error");
         let a = NonJokerCard::new(Suit::Club, CardRank::Ace);
         let b = NonJokerCard::new(Suit::Heart, CardRank::King);
-        assert_eq!(Ordering::Greater, comparer.cmp_cards(&a, &b))
+        assert_eq!(Ordering::Greater, comparer.cmp_cards(a, b))
     }
 
     #[test]
@@ -237,7 +237,7 @@ mod test {
         let comparer = CardComparer::new_with_suit_order(CardRank::Ace, suits_order).expect("constructor error");
         let a = NonJokerCard::new(Suit::Club, CardRank::Ace);
         let b = NonJokerCard::new(Suit::Heart, CardRank::Ace);
-        assert_eq!(Ordering::Less, comparer.cmp_cards(&a, &b))
+        assert_eq!(Ordering::Less, comparer.cmp_cards(a, b))
     }
  
     #[test]
@@ -251,6 +251,6 @@ mod test {
         let comparer = CardComparer::new_with_suit_order(CardRank::Ace, suits_order).expect("constructor error");
         let a = NonJokerCard::new(Suit::Heart, CardRank::Ace);
         let b = NonJokerCard::new(Suit::Heart, CardRank::Ace);
-        assert_eq!(Ordering::Equal, comparer.cmp_cards(&a, &b))
+        assert_eq!(Ordering::Equal, comparer.cmp_cards(a, b))
     }
 }

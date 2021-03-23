@@ -10,7 +10,7 @@ pub struct StartingHand(NonJokerCard, NonJokerCard);
 impl StartingHand {
     pub fn new(a: NonJokerCard, b: NonJokerCard) -> Self {
         let comparer = super::get_poker_card_comparer();
-        if comparer.cmp_cards(&a, &b) == Ordering::Greater {
+        if comparer.cmp_cards(a, b) == Ordering::Greater {
             Self(a, b)
         } else {
             Self(b, a)
