@@ -1,5 +1,6 @@
 extern crate playing_card;
 
+pub mod hand_rank;
 mod starting_hand;
 pub use starting_hand::StartingHand;
 
