@@ -1,6 +1,10 @@
 use playing_card::card::{ CardRank, NonJokerCard };
 use std::cmp;
 
+mod high_card;
+mod pair;
+mod two_pairs;
+
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash, PartialOrd, Ord)]
 pub enum HandRank {
     HighCard,
