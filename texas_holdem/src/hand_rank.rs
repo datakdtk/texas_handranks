@@ -4,6 +4,8 @@ use std::cmp;
 mod high_card;
 mod pair;
 mod two_pairs;
+mod three_of_a_kind;
+mod four_of_a_kind;
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash, PartialOrd, Ord)]
 pub enum HandRank {
