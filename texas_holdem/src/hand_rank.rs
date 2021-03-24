@@ -9,6 +9,8 @@ mod straight;
 mod flush;
 mod full_house;
 mod four_of_a_kind;
+mod straight_flush;
+mod royal_flush;
 
 #[derive(Debug, PartialEq, Eq, Copy, Clone, Hash, PartialOrd, Ord)]
 pub enum HandRank {

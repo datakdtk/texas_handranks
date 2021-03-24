@@ -21,7 +21,7 @@ impl CardRank {
             12 => CardRank::Queen,
             11 => CardRank::Jack,
             2 ..= 10 => CardRank::Number(CardRankNumber {value}),
-            _ => panic!("Argument is out of range".to_string()),
+            x => panic!(format!("Argument {} is out of range", x).to_string()),
         }
     }
 
