@@ -5,6 +5,7 @@ mod high_card;
 mod pair;
 mod two_pairs;
 mod three_of_a_kind;
+mod flush;
 mod full_house;
 mod four_of_a_kind;
 
