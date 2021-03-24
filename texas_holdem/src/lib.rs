@@ -9,14 +9,19 @@ pub use starting_hand::*;
 pub use total_hand::*;
 
 use playing_card::cmp::CardComparer;
-use playing_card::card::CardRank;
+use playing_card::card::{ CardRank, NonJokerCard };
 use std::cmp;
 
-pub fn get_poker_card_comparer() -> CardComparer {
+fn get_poker_card_comparer() -> CardComparer {
     CardComparer::new(CardRank::Ace)
 }
 
 pub fn cmp_card_ranks(a: CardRank, b: CardRank) -> cmp::Ordering {
     let comparer = get_poker_card_comparer();
     comparer.cmp_card_ranks(a, b)
+}
+
+pub fn cmp_cards(a: NonJokerCard, b: NonJokerCard) -> cmp::Ordering {
+    let comparer = get_poker_card_comparer();
+    comparer.cmp_cards(a, b)
 }

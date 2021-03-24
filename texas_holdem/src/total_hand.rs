@@ -14,10 +14,7 @@ impl TotalHand {
     pub fn new(cards: &[NonJokerCard]) -> Self {
         assert!(cards.len() <= 7, "The maximum number of cards in TotalHand is 7");
         let mut sortable_cards: Vec<NonJokerCard> = cards.iter().map(|c| *c).collect();
-        {
-            let comparer = super::get_poker_card_comparer();
-            sortable_cards.sort_by(|a, b| comparer.cmp_cards(*a, *b).reverse());
-        };
+        sortable_cards.sort_by(|a, b| super::cmp_cards(*a, *b).reverse());
         let mut rank_counts = HashMap::new();
         let mut suit_counts = HashMap::new();
         let mut straight_counter: StraightCounter = Default::default();
@@ -50,8 +47,7 @@ impl TotalHand {
                                        .filter(|(_k, v)| **v == 2)
                                        .map(|(k, _v)| *k)
                                        .collect();
-        let comparer = super::get_poker_card_comparer();
-        v.sort_by(|a, b|comparer.cmp_card_ranks(*a, *b).reverse());
+        v.sort_by(|a, b| super::cmp_card_ranks(*a, *b).reverse());
         v
     }
 
@@ -62,8 +58,7 @@ impl TotalHand {
                                        .filter(|(_k, v)| **v == 3)
                                        .map(|(k, _v)| *k)
                                        .collect();
-        let comparer = super::get_poker_card_comparer();
-        v.sort_by(|a, b|comparer.cmp_card_ranks(*a, *b).reverse());
+        v.sort_by(|a, b| super::cmp_card_ranks(*a, *b).reverse());
         v
     }
 

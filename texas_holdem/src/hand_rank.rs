@@ -71,13 +71,12 @@ pub struct HandValue {
 
 impl cmp::Ord for HandValue {
     fn cmp(&self, other: &Self) -> cmp::Ordering {
-        let comparer = super::get_poker_card_comparer();
         self.hand_rank.cmp(&other.hand_rank)
-            .then(comparer.cmp_card_ranks(self.card_ranks[0], other.card_ranks[0]))
-            .then(comparer.cmp_card_ranks(self.card_ranks[1], other.card_ranks[1]))
-            .then(comparer.cmp_card_ranks(self.card_ranks[2], other.card_ranks[2]))
-            .then(comparer.cmp_card_ranks(self.card_ranks[3], other.card_ranks[3]))
-            .then(comparer.cmp_card_ranks(self.card_ranks[4], other.card_ranks[4]))
+            .then(super::cmp_card_ranks(self.card_ranks[0], other.card_ranks[0]))
+            .then(super::cmp_card_ranks(self.card_ranks[1], other.card_ranks[1]))
+            .then(super::cmp_card_ranks(self.card_ranks[2], other.card_ranks[2]))
+            .then(super::cmp_card_ranks(self.card_ranks[3], other.card_ranks[3]))
+            .then(super::cmp_card_ranks(self.card_ranks[4], other.card_ranks[4]))
     }
 }
 
