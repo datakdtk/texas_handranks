@@ -4,15 +4,16 @@ use playing_card::card::NonJokerCard;
 
 
 pub(super) fn try_to_build_from_total_hand(hand: TotalHand) -> Option<BestFiveHand> {
-    if hand.cards().len() < 5 || hand.ranks_of_pairs().len() < 2 {
+    let ranks_of_pairs = hand.ranks_of_pairs();
+    if hand.cards().len() < 5 || ranks_of_pairs.len() < 2 {
         return None;
     }
-    let higher_rank_of_pair = hand.ranks_of_pairs()[0];
-    let lower_rank_of_pair = hand.ranks_of_pairs()[1];
-    let cards_of_higher_pair: Vec<&NonJokerCard> = hand.cards().iter().filter(|c| c.rank() == higher_rank_of_pair).collect();
-    let cards_of_lower_pair: Vec<&NonJokerCard> = hand.cards().iter().filter(|c| c.rank() == lower_rank_of_pair).collect();
+    let higher_rank = ranks_of_pairs[0];
+    let lower_rank = ranks_of_pairs[1];
+    let cards_of_higher_pair: Vec<&NonJokerCard> = hand.cards().iter().filter(|c| c.rank() == higher_rank).collect();
+    let cards_of_lower_pair: Vec<&NonJokerCard> = hand.cards().iter().filter(|c| c.rank() == lower_rank).collect();
     let non_pair_card = hand.cards().iter()
-                            .filter(|c| c.rank() != higher_rank_of_pair && c.rank() != lower_rank_of_pair)
+                            .filter(|c| c.rank() != higher_rank && c.rank() != lower_rank)
                             .next().expect("kicker of two pairs not found");
     assert_eq!(2, cards_of_higher_pair.len());
     assert_eq!(2, cards_of_lower_pair.len());
