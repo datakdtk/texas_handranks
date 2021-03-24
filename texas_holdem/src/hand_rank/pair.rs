@@ -4,12 +4,13 @@ use playing_card::card::NonJokerCard;
 
 
 pub(super) fn try_to_build_from_total_hand(hand: TotalHand) -> Option<BestFiveHand> {
-    if hand.cards().len() < 5 || hand.ranks_of_pairs().is_empty() {
+    let rank_of_pairs = hand.ranks_of_pairs();
+    if hand.cards().len() < 5 || rank_of_pairs.is_empty() {
         return None;
     }
-    let rank_of_pair = hand.ranks_of_pairs()[0];
-    let cards_of_pair: Vec<&NonJokerCard> = hand.cards().iter().filter(|c| c.rank() == rank_of_pair).collect();
-    let non_pair_cards: Vec<&NonJokerCard> =  hand.cards().iter().filter(|c| c.rank() != rank_of_pair).collect();
+    let rank= rank_of_pairs[0];
+    let cards_of_pair: Vec<&NonJokerCard> = hand.cards().iter().filter(|c| c.rank() == rank).collect();
+    let non_pair_cards: Vec<&NonJokerCard> =  hand.cards().iter().filter(|c| c.rank() != rank).collect();
     assert_eq!(2, cards_of_pair.len());
     assert!(non_pair_cards.len() >= 3);
 

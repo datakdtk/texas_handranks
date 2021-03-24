@@ -159,4 +159,18 @@ mod test {
         ];
         assert_eq!(expected_ranks, result_ranks)
     }
+
+    #[test]
+    fn hand_rank_of_result_is_two_pairs() {
+        let given_cards = [
+            NonJokerCard::new(Suit::Heart, CardRank::new(10)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Club, CardRank::new(10)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(7)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(2)),
+        ];
+        let hand = TotalHand::new(&given_cards);
+        let result = try_to_build_from_total_hand(hand);
+        assert_eq!(HandRank::TwoPairs, result.unwrap().value().hand_rank)
+    }
 }

@@ -4,12 +4,13 @@ use playing_card::card::NonJokerCard;
 
 
 pub(super) fn try_to_build_from_total_hand(hand: TotalHand) -> Option<BestFiveHand> {
-    if hand.cards().len() < 5 || hand.rank_of_quads().is_none() {
+    let maybe_rank_of_quads = hand.rank_of_quads();
+    if hand.cards().len() < 5 || maybe_rank_of_quads.is_none() {
         return None;
     }
-    let rank_of_quads = hand.rank_of_quads().unwrap();
-    let cards_of_quads: Vec<&NonJokerCard> = hand.cards().iter().filter(|c| c.rank() == rank_of_quads).collect();
-    let non_quad_cards: Vec<&NonJokerCard> =  hand.cards().iter().filter(|c| c.rank() != rank_of_quads).collect();
+    let rank = maybe_rank_of_quads.unwrap();
+    let cards_of_quads: Vec<&NonJokerCard> = hand.cards().iter().filter(|c| c.rank() == rank).collect();
+    let non_quad_cards: Vec<&NonJokerCard> =  hand.cards().iter().filter(|c| c.rank() != rank).collect();
     assert_eq!(4, cards_of_quads.len());
     assert!(non_quad_cards.len() >= 1);
 
