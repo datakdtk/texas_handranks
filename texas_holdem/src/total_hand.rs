@@ -78,7 +78,7 @@ impl TotalHand {
     /// Returns a suit of 5 or more cards if exists.
     pub fn suit_of_flush(&self) -> Option<Suit> {
         self.suit_counts.iter()
-            .filter(|(_k, v)| **v == 5)
+            .filter(|(_k, v)| **v >= 5)
             .map(|(k, _v)| *k)
             .last()
     }
@@ -339,13 +339,28 @@ mod test {
     }
 
     #[test]
-    fn can_detect_flush() {
+    fn can_detect_flush_with_5_same_suits() {
         let cards = vec![
             NonJokerCard::new(Suit::Heart, CardRank::new(13)),
             NonJokerCard::new(Suit::Heart, CardRank::new(2)),
             NonJokerCard::new(Suit::Heart, CardRank::new(4)),
             NonJokerCard::new(Suit::Club, CardRank::new(13)),
             NonJokerCard::new(Suit::Spade, CardRank::new(4)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(5)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(3)),
+        ];
+        let hand = TotalHand::new(&cards);
+        assert_eq!(Some(Suit::Heart), hand.suit_of_flush());
+    }
+
+    #[test]
+    fn can_detect_flush_with_6_same_suits() {
+        let cards = vec![
+            NonJokerCard::new(Suit::Heart, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Club, CardRank::new(13)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(1)),
             NonJokerCard::new(Suit::Heart, CardRank::new(5)),
             NonJokerCard::new(Suit::Heart, CardRank::new(3)),
         ];
