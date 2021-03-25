@@ -1,5 +1,4 @@
-use crate::TotalHand;
-use super::{ BestFiveHand, HandRank };
+use crate::card::{ BestFiveHand, HandRank, TotalHand};
 use playing_card::card:: { CardRank, NonJokerCard };
 
 

@@ -1,10 +1,9 @@
-use crate::TotalHand;
-use super::{ BestFiveHand, HandRank, straight_flush};
+use crate::card::{ BestFiveHand, HandRank, TotalHand};
 use playing_card::card::CardRank;
 
 
 pub(super) fn try_to_build_from_total_hand(hand: &TotalHand) -> Option<BestFiveHand> {
-    let maybe_straight_flush_hand = straight_flush::try_to_build_from_total_hand(hand);
+    let maybe_straight_flush_hand = super::straight_flush::try_to_build_from_total_hand(hand);
     if maybe_straight_flush_hand.is_none() {
         return None;
     }

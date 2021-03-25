@@ -1,17 +1,29 @@
+use super::{ BestFiveHand, TotalHand};
 
-use super::BestFiveHand;
-use super::high_card;
-use super::pair;
-use super::two_pairs;
-use super::three_of_a_kind;
-use super::straight;
-use super::flush;
-use super::full_house;
-use super::four_of_a_kind;
-use super::straight_flush;
-use super::royal_flush;
+mod high_card;
+mod pair;
+mod two_pairs;
+mod three_of_a_kind;
+mod straight;
+mod flush;
+mod full_house;
+mod four_of_a_kind;
+mod straight_flush;
+mod royal_flush;
 
-use crate::TotalHand;
+#[derive(Debug, PartialEq, Eq, Copy, Clone, Hash, PartialOrd, Ord)]
+pub enum HandRank {
+    HighCard,
+    Pair,
+    TwoPairs,
+    ThreeOfAKind,
+    Straight,
+    Flush,
+    FullHouse,
+    FourOfAKind,
+    StraightFlush,
+    RoyalFlush,
+}
 
 impl TotalHand {
     pub fn find_best_five_hand(&self) -> Option<BestFiveHand> {
@@ -31,8 +43,8 @@ impl TotalHand {
 
 #[cfg(test)]
 mod test {
+    use crate::card::HandRank;
     use super::*;
-    use crate::hand_rank::HandRank;
     use playing_card::card:: { CardRank, NonJokerCard, Suit };
 
     #[test]

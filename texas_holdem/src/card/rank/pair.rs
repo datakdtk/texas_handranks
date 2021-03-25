@@ -1,27 +1,26 @@
-use crate::TotalHand;
-use super::{ BestFiveHand, HandRank };
+use crate::card::{ BestFiveHand, HandRank, TotalHand};
 use playing_card::card::NonJokerCard;
 
 
 pub(super) fn try_to_build_from_total_hand(hand: &TotalHand) -> Option<BestFiveHand> {
-    let maybe_rank_of_quads = hand.rank_of_quads();
-    if hand.cards().len() < 5 || maybe_rank_of_quads.is_none() {
+    let rank_of_pairs = hand.ranks_of_pairs();
+    if hand.cards().len() < 5 || rank_of_pairs.is_empty() {
         return None;
     }
-    let rank = maybe_rank_of_quads.unwrap();
-    let cards_of_quads: Vec<&NonJokerCard> = hand.cards().iter().filter(|c| c.rank() == rank).collect();
-    let non_quad_cards: Vec<&NonJokerCard> =  hand.cards().iter().filter(|c| c.rank() != rank).collect();
-    assert_eq!(4, cards_of_quads.len());
-    assert!(non_quad_cards.len() >= 1);
+    let rank= rank_of_pairs[0];
+    let cards_of_pair: Vec<&NonJokerCard> = hand.cards().iter().filter(|c| c.rank() == rank).collect();
+    let non_pair_cards: Vec<&NonJokerCard> =  hand.cards().iter().filter(|c| c.rank() != rank).collect();
+    assert_eq!(2, cards_of_pair.len());
+    assert!(non_pair_cards.len() >= 3);
 
     let cards = [
-        *cards_of_quads[0],
-        *cards_of_quads[1],
-        *cards_of_quads[2],
-        *cards_of_quads[3],
-        *non_quad_cards[0],
+        *cards_of_pair[0],
+        *cards_of_pair[1],
+        *non_pair_cards[0],
+        *non_pair_cards[1],
+        *non_pair_cards[2],
     ];
-    Some(BestFiveHand { cards, rank: HandRank::FourOfAKind })
+    Some(BestFiveHand { cards, rank: HandRank::Pair })
 }
 
 
@@ -31,12 +30,12 @@ mod test {
     use playing_card::card:: { CardRank, NonJokerCard, Suit };
 
     #[test]
-    fn returns_none_when_quads_exist_but_only_4_cards_are_given() {
+    fn returns_none_when_is_paired_but_only_4_cards_are_given() {
         let given_cards = [
             NonJokerCard::new(Suit::Heart, CardRank::new(10)),
-            NonJokerCard::new(Suit::Club, CardRank::new(10)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
             NonJokerCard::new(Suit::Spade, CardRank::new(10)),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(10)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(9)),
         ];
         let hand = TotalHand::new(&given_cards);
         let result = try_to_build_from_total_hand(&hand);
@@ -46,12 +45,12 @@ mod test {
     }
 
     #[test]
-    fn returns_none_when_5_cards_are_given_but_no_quads() {
+    fn returns_none_when_5_cards_are_given_but_no_pair() {
         let given_cards = [
             NonJokerCard::new(Suit::Heart, CardRank::new(10)),
             NonJokerCard::new(Suit::Heart, CardRank::new(2)),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(10)),
-            NonJokerCard::new(Suit::Club, CardRank::new(10)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(9)),
             NonJokerCard::new(Suit::Spade, CardRank::new(7)),
         ];
         let hand = TotalHand::new(&given_cards);
@@ -62,13 +61,13 @@ mod test {
     }
 
     #[test]
-    fn returns_some_when_5_cards_are_given_and_quads_exit() {
+    fn returns_some_when_5_cards_are_given_and_is_paired() {
         let given_cards = [
             NonJokerCard::new(Suit::Heart, CardRank::new(10)),
             NonJokerCard::new(Suit::Heart, CardRank::new(2)),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(10)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
             NonJokerCard::new(Suit::Club, CardRank::new(10)),
-            NonJokerCard::new(Suit::Spade, CardRank::new(10)),
+            NonJokerCard::new(Suit::Spade, CardRank::new(7)),
         ];
         let hand = TotalHand::new(&given_cards);
         let result = try_to_build_from_total_hand(&hand);
@@ -78,15 +77,14 @@ mod test {
     }
 
     #[test]
-    fn rank_of_quads_comes_first_in_result_value_and_other_ranks_are_sorted() {
+    fn rank_of_pair_comes_first_in_result_value_and_other_ranks_are_sorted() {
         let given_cards = [
             NonJokerCard::new(Suit::Heart, CardRank::new(10)),
             NonJokerCard::new(Suit::Heart, CardRank::new(2)),
-            NonJokerCard::new(Suit::Club, CardRank::new(2)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
             NonJokerCard::new(Suit::Heart, CardRank::new(9)),
             NonJokerCard::new(Suit::Spade, CardRank::new(7)),
             NonJokerCard::new(Suit::Spade, CardRank::new(2)),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(2)),
         ];
         let hand = TotalHand::new(&given_cards);
         let result = try_to_build_from_total_hand(&hand);
@@ -94,26 +92,25 @@ mod test {
         let expected_ranks = [
             CardRank::new(2),
             CardRank::new(2),
-            CardRank::new(2),
-            CardRank::new(2),
             CardRank::new(10),
+            CardRank::new(9),
+            CardRank::new(7),
         ];
         assert_eq!(expected_ranks, result_ranks)
     }
 
     #[test]
-    fn hand_rank_of_result_is_four_of_a_kind() {
+    fn hand_rank_of_result_is_pair() {
         let given_cards = [
             NonJokerCard::new(Suit::Heart, CardRank::new(10)),
             NonJokerCard::new(Suit::Heart, CardRank::new(2)),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(2)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
             NonJokerCard::new(Suit::Heart, CardRank::new(9)),
             NonJokerCard::new(Suit::Spade, CardRank::new(7)),
             NonJokerCard::new(Suit::Spade, CardRank::new(2)),
-            NonJokerCard::new(Suit::Diamond, CardRank::new(2)),
         ];
         let hand = TotalHand::new(&given_cards);
         let result = try_to_build_from_total_hand(&hand);
-        assert_eq!(HandRank::FourOfAKind, result.unwrap().value().hand_rank)
+        assert_eq!(HandRank::Pair, result.unwrap().value().hand_rank)
     }
 }

@@ -1,5 +1,4 @@
-use super::{ BestFiveHand, HandRank };
-use crate::TotalHand;
+use crate::card::{ BestFiveHand, HandRank, TotalHand};
 
 pub(super) fn try_to_build_from_total_hand(hand: &TotalHand) -> Option<BestFiveHand> {
     if hand.cards().len() < 5 {
