@@ -3,18 +3,19 @@ use super::{ BestFiveHand, HandRank };
 use playing_card::card:: { CardRank, NonJokerCard };
 
 
-pub(super) fn try_to_build_from_total_hand(hand: TotalHand) -> Option<BestFiveHand> {
+pub(super) fn try_to_build_from_total_hand(hand: &TotalHand) -> Option<BestFiveHand> {
     let head_ranks_of_straight = hand.head_ranks_of_straight();
     if head_ranks_of_straight.is_empty() {
         return None;
     }
-    let rank_of_head = head_ranks_of_straight[0];
+    let head = head_ranks_of_straight[0];
+    let head_rank_int = if head == CardRank::Ace { 14 } else { head.to_int() };
     let ranks = [
-        rank_of_head,
-        CardRank::new(rank_of_head.to_int() - 1),
-        CardRank::new(rank_of_head.to_int() - 2),
-        CardRank::new(rank_of_head.to_int() - 3),
-        CardRank::new(rank_of_head.to_int() - 4),
+        head,
+        CardRank::new(head_rank_int - 1),
+        CardRank::new(head_rank_int - 2),
+        CardRank::new(head_rank_int - 3),
+        CardRank::new(head_rank_int - 4),
     ];
 
     let card_vec: Vec<NonJokerCard> = ranks.iter().map(|r| {
@@ -50,7 +51,7 @@ mod test {
             NonJokerCard::new(Suit::Diamond, CardRank::new(9)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let Some(_) = result {
             panic!("Result is expected to be None");
         }
@@ -66,7 +67,39 @@ mod test {
             NonJokerCard::new(Suit::Diamond, CardRank::new(9)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
+        if let None = result {
+            panic!("Result is expected not to be None");
+        }
+    }
+
+    #[test]
+    fn can_build_ace_high_straight() {
+        let given_cards = [
+            NonJokerCard::new(Suit::Heart, CardRank::new(10)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(1)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(12)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(11)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(13)),
+        ];
+        let hand = TotalHand::new(&given_cards);
+        let result = try_to_build_from_total_hand(&hand);
+        if let None = result {
+            panic!("Result is expected not to be None");
+        }
+    }
+
+    #[test]
+    fn can_build_five_high_straight() {
+        let given_cards = [
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(1)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(3)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+            NonJokerCard::new(Suit::Diamond, CardRank::new(5)),
+        ];
+        let hand = TotalHand::new(&given_cards);
+        let result = try_to_build_from_total_hand(&hand);
         if let None = result {
             panic!("Result is expected not to be None");
         }
@@ -83,7 +116,7 @@ mod test {
             NonJokerCard::new(Suit::Diamond, CardRank::new(1)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         let result_ranks = result.unwrap().value().card_ranks;
         let expected_ranks = [
             CardRank::new(12),
@@ -106,7 +139,7 @@ mod test {
             NonJokerCard::new(Suit::Diamond, CardRank::new(13)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         let result_ranks = result.unwrap().value().card_ranks;
         let expected_ranks = [
             CardRank::new(13),
@@ -128,7 +161,7 @@ mod test {
             NonJokerCard::new(Suit::Diamond, CardRank::new(9)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         assert_eq!(HandRank::Straight, result.unwrap().value().hand_rank)
     }
 }

@@ -3,7 +3,7 @@ use super::{ BestFiveHand, HandRank };
 use playing_card::card::NonJokerCard;
 
 
-pub(super) fn try_to_build_from_total_hand(hand: TotalHand) -> Option<BestFiveHand> {
+pub(super) fn try_to_build_from_total_hand(hand: &TotalHand) -> Option<BestFiveHand> {
     let maybe_rank_of_quads = hand.rank_of_quads();
     if hand.cards().len() < 5 || maybe_rank_of_quads.is_none() {
         return None;
@@ -39,7 +39,7 @@ mod test {
             NonJokerCard::new(Suit::Diamond, CardRank::new(10)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let Some(_) = result {
             panic!("Result is expected to be None");
         }
@@ -55,7 +55,7 @@ mod test {
             NonJokerCard::new(Suit::Spade, CardRank::new(7)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let Some(_) = result {
             panic!("Result is expected to be None");
         }
@@ -71,7 +71,7 @@ mod test {
             NonJokerCard::new(Suit::Spade, CardRank::new(10)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let None = result {
             panic!("Result is expected not to be None");
         }
@@ -89,7 +89,7 @@ mod test {
             NonJokerCard::new(Suit::Diamond, CardRank::new(2)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         let result_ranks = result.unwrap().value().card_ranks;
         let expected_ranks = [
             CardRank::new(2),
@@ -113,7 +113,7 @@ mod test {
             NonJokerCard::new(Suit::Diamond, CardRank::new(2)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         assert_eq!(HandRank::FourOfAKind, result.unwrap().value().hand_rank)
     }
 }

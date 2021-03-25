@@ -3,7 +3,7 @@ use super::{ BestFiveHand, HandRank };
 use playing_card::card:: { CardRank, NonJokerCard };
 
 
-pub(super) fn try_to_build_from_total_hand(hand: TotalHand) -> Option<BestFiveHand> {
+pub(super) fn try_to_build_from_total_hand(hand: &TotalHand) -> Option<BestFiveHand> {
     let maybe_suit_of_flush = hand.suit_of_flush();
     let head_ranks_of_straight = hand.head_ranks_of_straight();
     if head_ranks_of_straight.is_empty() || maybe_suit_of_flush.is_none() {
@@ -61,7 +61,7 @@ mod test {
             NonJokerCard::new(Suit::Diamond, CardRank::new(9)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let Some(_) = result {
             panic!("Result is expected to be None");
         }
@@ -77,7 +77,7 @@ mod test {
             NonJokerCard::new(Suit::Heart, CardRank::new(2)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let Some(_) = result {
             panic!("Result is expected to be None");
         }
@@ -94,7 +94,7 @@ mod test {
             NonJokerCard::new(Suit::Spade, CardRank::new(9)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let Some(_) = result {
             panic!("Result is expected to be None");
         }
@@ -110,7 +110,7 @@ mod test {
             NonJokerCard::new(Suit::Heart, CardRank::new(9)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let None = result {
             panic!("Result is expected not to be None");
         }
@@ -127,7 +127,7 @@ mod test {
             NonJokerCard::new(Suit::Heart, CardRank::new(9)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let None = result {
             panic!("Result is expected not to be None");
         }
@@ -144,7 +144,7 @@ mod test {
             NonJokerCard::new(Suit::Heart, CardRank::new(13)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let None = result {
             panic!("Result is expected not to be None");
         }
@@ -171,7 +171,7 @@ mod test {
             NonJokerCard::new(Suit::Spade, CardRank::new(13)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let None = result {
             panic!("Result is expected not to be None");
         }
@@ -199,7 +199,7 @@ mod test {
             NonJokerCard::new(Suit::Spade, CardRank::new(13)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let None = result {
             panic!("Result is expected not to be None");
         }
@@ -226,7 +226,7 @@ mod test {
             NonJokerCard::new(Suit::Heart, CardRank::new(13)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let None = result {
             panic!("Result is expected not to be None");
         }
@@ -252,7 +252,7 @@ mod test {
             NonJokerCard::new(Suit::Heart, CardRank::new(9)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         assert_eq!(HandRank::StraightFlush, result.unwrap().value().hand_rank)
     }
 }

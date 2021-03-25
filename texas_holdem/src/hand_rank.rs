@@ -1,7 +1,9 @@
 use playing_card::card::NonJokerCard;
 
 mod hand_value;
-pub use hand_value::*;
+pub use hand_value::HandValue;
+mod total_hand;
+pub use total_hand::*;
 
 mod high_card;
 mod pair;

@@ -1,7 +1,7 @@
 use super::{ BestFiveHand, HandRank };
 use crate::TotalHand;
 
-pub(super) fn try_to_build_from_total_hand(hand: TotalHand) -> Option<BestFiveHand> {
+pub(super) fn try_to_build_from_total_hand(hand: &TotalHand) -> Option<BestFiveHand> {
     if hand.cards().len() < 5 {
         return None;
     }
@@ -31,7 +31,7 @@ mod test {
             NonJokerCard::new(Suit::Heart, CardRank::new(9)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let Some(_) = result {
             panic!("Result is expected to be None");
         }
@@ -47,7 +47,7 @@ mod test {
             NonJokerCard::new(Suit::Spade, CardRank::new(7)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let None = result {
             panic!("Result is expected not to be None");
         }
@@ -64,7 +64,7 @@ mod test {
             NonJokerCard::new(Suit::Spade, CardRank::new(12)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         let result_ranks = result.unwrap().value().card_ranks;
         let expected_ranks = [
             CardRank::new(12),
@@ -87,7 +87,7 @@ mod test {
             NonJokerCard::new(Suit::Spade, CardRank::new(12)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         assert_eq!(HandRank::HighCard, result.unwrap().value().hand_rank)
     }
 }

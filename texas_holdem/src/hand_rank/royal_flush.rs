@@ -3,7 +3,7 @@ use super::{ BestFiveHand, HandRank, straight_flush};
 use playing_card::card::CardRank;
 
 
-pub(super) fn try_to_build_from_total_hand(hand: TotalHand) -> Option<BestFiveHand> {
+pub(super) fn try_to_build_from_total_hand(hand: &TotalHand) -> Option<BestFiveHand> {
     let maybe_straight_flush_hand = straight_flush::try_to_build_from_total_hand(hand);
     if maybe_straight_flush_hand.is_none() {
         return None;
@@ -32,7 +32,7 @@ mod test {
             NonJokerCard::new(Suit::Diamond, CardRank::new(1)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let Some(_) = result {
             panic!("Result is expected to be None");
         }
@@ -49,7 +49,7 @@ mod test {
             NonJokerCard::new(Suit::Diamond, CardRank::new(1)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let Some(_) = result {
             panic!("Result is expected to be None");
         }
@@ -65,7 +65,7 @@ mod test {
             NonJokerCard::new(Suit::Heart, CardRank::new(1)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let Some(_) = result {
             panic!("Result is expected to be None");
         }
@@ -81,7 +81,7 @@ mod test {
             NonJokerCard::new(Suit::Heart, CardRank::new(13)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let None = result {
             panic!("Result is expected not to be None");
         }
@@ -98,7 +98,7 @@ mod test {
             NonJokerCard::new(Suit::Heart, CardRank::new(13)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let None = result {
             panic!("Result is expected not to be None");
         }
@@ -114,7 +114,7 @@ mod test {
             NonJokerCard::new(Suit::Heart, CardRank::new(13)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         if let None = result {
             panic!("Result is expected not to be None");
         }
@@ -140,7 +140,7 @@ mod test {
             NonJokerCard::new(Suit::Heart, CardRank::new(13)),
         ];
         let hand = TotalHand::new(&given_cards);
-        let result = try_to_build_from_total_hand(hand);
+        let result = try_to_build_from_total_hand(&hand);
         assert_eq!(HandRank::RoyalFlush, result.unwrap().value().hand_rank)
     }
 }
