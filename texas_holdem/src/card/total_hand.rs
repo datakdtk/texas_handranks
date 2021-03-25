@@ -1,3 +1,4 @@
+use super::{ Board, StartingHand };
 use playing_card::card:: { CardRank, NonJokerCard, Suit };
 use std::collections::HashMap;
 
@@ -33,6 +34,14 @@ impl TotalHand {
             suit_counts,
             heads_of_straight: straight_counter.determined_heads_of_straight(),
         }
+    }
+
+    pub fn new_from_starting_hand_and_board(hand: StartingHand, board: &Board) -> Self {
+        let cards = [
+            &hand.both_cards()[..],
+            &board.cards()[..],
+        ];
+        Self::new(&cards.concat())
     }
 
     /// Returns all cards sorted in descending order.
@@ -161,7 +170,17 @@ impl StraightCounter {
 
 #[cfg(test)]
 mod test {
+    use crate::Phase;
     use super::*;
+
+    #[test]
+    fn can_construct_from_hand_and_board() {
+        let mut board = Board::new();
+        let starting_hand = board.deal_starting_hands(1)[0];
+        board.deal_cards_until(Phase::River);
+        let total_hand = TotalHand::new_from_starting_hand_and_board(starting_hand, &board);
+        assert_eq!(7, total_hand.cards().len());
+    }
 
     #[test]
     fn can_create_with_no_card() {

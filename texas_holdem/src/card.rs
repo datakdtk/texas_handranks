@@ -1,10 +1,12 @@
 mod best_five_hand;
+mod board;
 mod hand_value;
 mod rank;
 mod starting_hand;
 mod total_hand;
 
 pub use best_five_hand::BestFiveHand;
+pub use board::Board;
 pub use hand_value::HandValue;
 pub use rank::HandRank;
 pub use starting_hand::StartingHand;
