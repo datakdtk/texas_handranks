@@ -1,9 +1,14 @@
 use playing_card::card::CardRank;
 use texas_holdem::card::StartingHand;
 
-pub const TARGET_VALUE: u8 = 5;
+const TARGET_VALUE: u8 = 5;
 
-pub fn evaluate_hand(hand: StartingHand) -> u8 {
+pub fn evaluate_hand(hand: StartingHand) -> bool {
+    calculate_hand_value(hand) >= TARGET_VALUE
+}
+
+
+fn calculate_hand_value(hand: StartingHand) -> u8 {
     let mut v = 0;
     for c in hand.both_cards().iter() {
         v += evaluate_card_rank(c.rank());
@@ -40,16 +45,18 @@ mod test {
     
    fn assert_more_than_target(hand: StartingHand) {
          assert!(
-            evaluate_hand(hand) >= TARGET_VALUE,
+            calculate_hand_value(hand) >= TARGET_VALUE,
             format!("hand value should be more than target but actual is {}", evaluate_hand(hand))
-        )
+        );
+        assert!(evaluate_hand(hand));
     }
 
    fn assert_less_than_target(hand: StartingHand) {
          assert!(
-            evaluate_hand(hand) < TARGET_VALUE,
+            calculate_hand_value(hand) < TARGET_VALUE,
             format!("hand value should be less than target but actual is {}", evaluate_hand(hand))
-        )
+        );
+        assert!(!evaluate_hand(hand));
     }
 
     #[test]
