@@ -2,4 +2,5 @@
 members = [
   "playing_card",
   "texas_holdem",
+  "texas_holdem_monte_carlo",
 ]

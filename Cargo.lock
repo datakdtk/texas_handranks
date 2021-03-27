@@ -84,6 +84,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "texas_holdem_monte_carlo"
+version = "0.1.0"
+dependencies = [
+ "playing_card",
+ "texas_holdem",
+]
+
+[[package]]
 name = "wasi"
 version = "0.10.2+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
