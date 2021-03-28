@@ -12,8 +12,10 @@ pub struct Board {
 
 impl Board {
     pub fn new() -> Self {
+        let mut deck = Deck::new(NonJokerCard::all());
+        deck.shuffle();
         Self {
-            deck: Deck::new(NonJokerCard::all()),
+            deck,
             flop: None,
             turn: None,
             river: None,
