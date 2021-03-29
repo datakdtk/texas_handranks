@@ -32,7 +32,10 @@ impl TrialResultOfHand {
 }
 
 pub fn run_worker(sender: Sender<TrialResultOfHand>, number_of_players: usize, trial_count: usize) {
-    for _ in 1 ..= trial_count {
+    for n in 1 ..= trial_count {
+        if n % 10000 == 0 {
+            eprintln!("{}", n);
+        }
         do_trial(&sender, number_of_players);
     }
 }

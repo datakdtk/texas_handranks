@@ -12,8 +12,8 @@ use std::thread;
 use std::sync::mpsc;
 
 fn main() {
-    let worker_count = 10;
-    let trial_per_worker = 100000;
+    let worker_count = 8;
+    let trial_per_worker = 500000;
     let num_of_players = 6;
     
     let (tx, rx) = mpsc::channel();
