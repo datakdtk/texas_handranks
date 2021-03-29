@@ -61,17 +61,13 @@ fn do_trial(sender: &Sender<TrialResultOfHand>, num_of_players: usize) {
 }
 
 fn flop_check(sender: &Sender<TrialResultOfHand>, starting_hands: Vec<StartingHand>, board: &Board) -> Vec<StartingHand> {
-    let starts_and_totals: Vec<(StartingHand, TotalHand)> = starting_hands.iter().map(|starting| {
-        let total = TotalHand::new_from_starting_hand_and_board(*starting, board);
-        (*starting, total)
-    }).collect();
     let mut winners = Vec::new();
     let mut losers = Vec::new();
-    for (s, t) in starts_and_totals {
-        if flop_hand::evaluate_hand(t) {
-            winners.push(s);
+    for s in starting_hands.iter() {
+        if flop_hand::evaluate_hand(*s, board.flop().unwrap()) {
+            winners.push(*s);
         } else {
-            losers.push(s);
+            losers.push(*s);
         }
     };
     if winners.is_empty() {

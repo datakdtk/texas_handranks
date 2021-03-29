@@ -9,6 +9,7 @@ pub struct TotalHand {
     rank_counts: HashMap<CardRank, u8>,
     suit_counts: HashMap<Suit, u8>,
     heads_of_straight: Vec<CardRank>, 
+    is_straight_draw: bool,
 }
 
 impl TotalHand {
@@ -32,6 +33,7 @@ impl TotalHand {
             cards: sortable_cards,
             rank_counts,
             suit_counts,
+            is_straight_draw: straight_counter.is_straight_draw,
             heads_of_straight: straight_counter.determined_heads_of_straight(),
         }
     }
@@ -87,8 +89,18 @@ impl TotalHand {
             .last()
     }
 
+    /// Returns true if at least one suit has 5 or more cards.
+    pub fn is_flush_draw(&self) -> bool {
+        self.suit_counts.iter()
+            .any(|(_k, v)| *v >= 4)
+    }
+
     pub fn head_ranks_of_straight(&self) -> Vec<CardRank> {
         self.heads_of_straight.clone()
+    }
+
+    pub fn is_open_end_straight_draw(&self) -> bool {
+        self.is_straight_draw
     }
 }
 
@@ -100,6 +112,7 @@ struct StraightCounter {
     previous_rank: Option<CardRank>,
     determined_heads: Vec<CardRank>,
     has_ace: bool,
+    is_straight_draw: bool,
 }
 
 impl StraightCounter {
@@ -135,6 +148,10 @@ impl StraightCounter {
         // Count up if new_rank is connectable
         self.current_count += 1;
 
+        if self.current_count >= 4 {
+            self.is_straight_draw = true;
+        }
+        
         // A straight sequence is completed. Save current_head and update current_head and current_count.
         if self.current_count >= 5 {
             assert_eq!(5, self.current_count);
@@ -680,5 +697,66 @@ mod test {
             CardRank::new(6),
         ];
         assert_eq!(expected, hand.head_ranks_of_straight());
+    }
+
+    #[test]
+    fn sequence_of_4_cards_is_open_end_straight_draw() {
+        let cards = vec![
+            NonJokerCard::new(Suit::Heart, CardRank::new(6)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(5)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(3)),
+            NonJokerCard::new(Suit::Club, CardRank::new(4)),
+        ];
+        let hand = TotalHand::new(&cards);
+        assert!(hand.is_open_end_straight_draw());
+    }
+
+    #[test]
+    fn open_end_straight_draw_with_extra_card() {
+        let cards = vec![
+            NonJokerCard::new(Suit::Heart, CardRank::new(8)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(6)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(5)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(3)),
+            NonJokerCard::new(Suit::Club, CardRank::new(4)),
+        ];
+        let hand = TotalHand::new(&cards);
+        assert!(hand.is_open_end_straight_draw());
+    }
+
+    #[test]
+    fn gapped_sequence_of_4_cards_is_not_open_end_straight_draw() {
+        let cards = vec![
+            NonJokerCard::new(Suit::Heart, CardRank::new(6)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(5)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Club, CardRank::new(4)),
+        ];
+        let hand = TotalHand::new(&cards);
+        assert!(!hand.is_open_end_straight_draw());
+    }
+
+    #[test]
+    fn same_suit_4_cards_are_flush_draw() {
+        let cards = vec![
+            NonJokerCard::new(Suit::Heart, CardRank::new(6)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(5)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(4)),
+        ];
+        let hand = TotalHand::new(&cards);
+        assert!(hand.is_flush_draw());
+    }
+
+    #[test]
+    fn same_suit_3_cards_are_not_flush_draw() {
+        let cards = vec![
+            NonJokerCard::new(Suit::Heart, CardRank::new(6)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(5)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
+            NonJokerCard::new(Suit::Club, CardRank::new(4)),
+        ];
+        let hand = TotalHand::new(&cards);
+        assert!(!hand.is_flush_draw());
     }
 }
