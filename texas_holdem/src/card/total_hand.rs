@@ -1,6 +1,6 @@
 use super::{ Board, StartingHand };
 use playing_card::card:: { CardRank, NonJokerCard, Suit };
-use std::collections::HashMap;
+use std::collections::{ HashMap, HashSet };
 
 /// Set of all cards being available for making hand ranks
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -8,8 +8,7 @@ pub struct TotalHand {
     cards: Vec<NonJokerCard>,
     rank_counts: HashMap<CardRank, u8>,
     suit_counts: HashMap<Suit, u8>,
-    heads_of_straight: Vec<CardRank>, 
-    is_straight_draw: bool,
+    ranks_of_straight: RanksOfStraight,
 }
 
 impl TotalHand {
@@ -19,22 +18,23 @@ impl TotalHand {
         sortable_cards.sort_by(|a, b| super::cmp_cards(*a, *b).reverse());
         let mut rank_counts = HashMap::new();
         let mut suit_counts = HashMap::new();
-        let mut straight_counter: StraightCounter = Default::default();
-
+        // 13 bit integer that indicates existence of cards of each number
+        let mut bit_of_cards = 0u16;
         for c in sortable_cards.iter() {
             let rc = rank_counts.entry(c.rank()).or_insert(0);
             *rc += 1;
             let sc = suit_counts.entry(c.suit()).or_insert(0);
             *sc += 1;
-            straight_counter.try_to_count_up(c.rank());
+            bit_of_cards = bit_of_cards | 2u16.pow(u32::from(c.rank().to_int()-1));
         }
+
+        let ranks_of_straight = RanksOfStraight::calculate(bit_of_cards);
 
         Self {
             cards: sortable_cards,
             rank_counts,
             suit_counts,
-            is_straight_draw: straight_counter.is_straight_draw,
-            heads_of_straight: straight_counter.determined_heads_of_straight(),
+            ranks_of_straight,
         }
     }
 
@@ -95,94 +95,65 @@ impl TotalHand {
             .any(|(_k, v)| *v >= 4)
     }
 
-    pub fn head_ranks_of_straight(&self) -> Vec<CardRank> {
-        self.heads_of_straight.clone()
+    pub fn head_ranks_of_straight(&self) -> &[CardRank] {
+        &self.ranks_of_straight.ranks_of_head
     }
 
-    pub fn is_open_end_straight_draw(&self) -> bool {
-        self.is_straight_draw
+    pub fn straight_draw_ranks(&self) -> &[CardRank] {
+        &self.ranks_of_straight.ranks_of_draw
     }
 }
 
-/// Helper struct to check sequence of Straight in building TotalHand struct.
-#[derive(Debug, Default)]
-struct StraightCounter {
-    current_head: Option<CardRank>,
-    current_count: u8,
-    previous_rank: Option<CardRank>,
-    determined_heads: Vec<CardRank>,
-    has_ace: bool,
-    is_straight_draw: bool,
+#[derive(Debug, PartialEq, Eq, Clone)]
+struct RanksOfStraight {
+    ranks_of_head: Vec<CardRank>,
+    ranks_of_draw: Vec<CardRank>,
 }
 
-impl StraightCounter {
-    /// new_rank is expected to be given in descending order
-    fn try_to_count_up(&mut self, new_rank: CardRank) {
-        if new_rank == CardRank::Ace {
-            self.has_ace = true; // memorize ace to create 5 to ace straight later.
-        }
-        // Initialize at the first time of method call
-        if self.current_head == None {
-            self.initialize_counting(new_rank);
-        }
-        // Do not count same rank twice
-        if self.previous_rank == Some(new_rank) {
-            return;
-        }
+impl RanksOfStraight {
+    fn calculate(bit_of_cards: u16) -> Self {
+        let mut ranks_of_head = Vec::new();
+        let mut rank_set_of_draw = HashSet::new();
 
-        let connecting_rank = match self.previous_rank {
-            Some(CardRank::Ace) if self.current_head == Some(CardRank::Ace) => CardRank::King,
-            Some(x) if x != CardRank::Ace => CardRank::new(x.to_int() - 1),
-            _ => return, // Sequence can not get longer
+        // pair of bit representing straight and its head rank
+        let bits_of_straight = [
+            (0b1111000000001u16, CardRank::Ace),
+            (0b1111100000000u16, CardRank::King),
+            (0b0111110000000u16, CardRank::Queen),
+            (0b0011111000000u16, CardRank::Jack),
+            (0b0001111100000u16, CardRank::new(10)),
+            (0b0000111110000u16, CardRank::new(9)),
+            (0b0000011111000u16, CardRank::new(8)),
+            (0b0000001111100u16, CardRank::new(7)),
+            (0b0000000111110u16, CardRank::new(6)),
+            (0b0000000011111u16, CardRank::new(5)),
+        ];
+
+        let card_bit_map: HashMap<u16, CardRank> = (1 ..= 13)
+            .map(|n| (2u16.pow(u32::from(n-1)), CardRank::new(n)))
+            .collect();
+
+        for (target_bit, head_rank) in &bits_of_straight {
+            let and = *target_bit & bit_of_cards;
+            // when straight is completed
+            if and == *target_bit { 
+                ranks_of_head.push(*head_rank);
+                continue;
+            }
+
+            let lacked = target_bit ^ and;
+            // when the lacked bit exactly equals to a power of 2
+            // it means there is only one card lacking (= straight_draw)
+            if lacked > 0 && (lacked & (lacked - 1) == 0) {
+                rank_set_of_draw.insert(card_bit_map[&lacked]);
+            }
         };
 
-        // Update previous rank after checking connecting_rank
-        self.previous_rank = Some(new_rank);
-
-        // Sequence has broken. Restart counting from 1 with new head
-        if new_rank != connecting_rank {
-            self.initialize_counting(new_rank);
-            return;
-        }
-
-        // Count up if new_rank is connectable
-        self.current_count += 1;
-
-        if self.current_count >= 4 {
-            self.is_straight_draw = true;
-        }
-        
-        // A straight sequence is completed. Save current_head and update current_head and current_count.
-        if self.current_count >= 5 {
-            assert_eq!(5, self.current_count);
-            self.determined_heads.push(self.current_head.expect("current_head_is_missing"));
-            self.current_head = match self.current_head {
-                Some(CardRank::Ace) => Some(CardRank::King),
-                Some(x) if x.to_int() > 2 => Some(CardRank::new(x.to_int() - 1)),
-                x => panic!(format!("current_head is unexpected value when completing straight: {:?}", x)),
-            };
-            self.current_count = 4;
-        }
-
-        // Complete 5 to ace straight if current sequence is from 5 to 2
-        let head_five = CardRank::new(5);
-        if self.current_head == Some(head_five) && self.current_count == 4 && self.has_ace {
-            self.determined_heads.push(head_five);
-            self.current_count = 0; // never expected to be counted up later.
-        }
-    }
-
-    fn initialize_counting(&mut self, first_rank: CardRank) {
-        self.current_head = Some(first_rank);
-        self.current_count = 1;
-        self.previous_rank = Some(first_rank);
-    }
-
-    fn determined_heads_of_straight(self) -> Vec<CardRank> {
-        self.determined_heads
+        let mut ranks_of_draw: Vec<CardRank> = rank_set_of_draw.iter().map(|r| *r).collect();
+        ranks_of_draw.sort_by(|a, b| super::cmp_card_ranks(*a, *b).reverse());
+        Self { ranks_of_head, ranks_of_draw}
     }
 }
-
 
 
 #[cfg(test)]
@@ -426,7 +397,7 @@ mod test {
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
         ];
-        assert_eq!(expected, hand.head_ranks_of_straight());
+        assert_eq!(&expected, hand.head_ranks_of_straight());
     }
 
     #[test]
@@ -442,7 +413,7 @@ mod test {
         let expected: Vec<CardRank> = vec![
             CardRank::new(6),
         ];
-        assert_eq!(expected, hand.head_ranks_of_straight());
+        assert_eq!(&expected, hand.head_ranks_of_straight());
     }
 
     #[test]
@@ -459,7 +430,7 @@ mod test {
         let expected: Vec<CardRank> = vec![
             CardRank::new(8),
         ];
-        assert_eq!(expected, hand.head_ranks_of_straight());
+        assert_eq!(&expected, hand.head_ranks_of_straight());
     }
 
     #[test]
@@ -476,7 +447,7 @@ mod test {
         let expected: Vec<CardRank> = vec![
             CardRank::new(8),
         ];
-        assert_eq!(expected, hand.head_ranks_of_straight());
+        assert_eq!(&expected, hand.head_ranks_of_straight());
     }
 
     #[test]
@@ -494,7 +465,7 @@ mod test {
         let expected: Vec<CardRank> = vec![
             CardRank::new(8),
         ];
-        assert_eq!(expected, hand.head_ranks_of_straight());
+        assert_eq!(&expected, hand.head_ranks_of_straight());
     }
 
     #[test]
@@ -511,7 +482,7 @@ mod test {
         let expected: Vec<CardRank> = vec![
             CardRank::new(8),
         ];
-        assert_eq!(expected, hand.head_ranks_of_straight());
+        assert_eq!(&expected, hand.head_ranks_of_straight());
     }
 
     #[test]
@@ -528,7 +499,7 @@ mod test {
         let expected: Vec<CardRank> = vec![
             CardRank::new(8),
         ];
-        assert_eq!(expected, hand.head_ranks_of_straight());
+        assert_eq!(&expected, hand.head_ranks_of_straight());
     }
 
     #[test]
@@ -545,7 +516,7 @@ mod test {
         let expected: Vec<CardRank> = vec![
             CardRank::new(8),
         ];
-        assert_eq!(expected, hand.head_ranks_of_straight());
+        assert_eq!(&expected, hand.head_ranks_of_straight());
     }
 
     #[test]
@@ -563,7 +534,7 @@ mod test {
         let expected: Vec<CardRank> = vec![
             CardRank::new(8),
         ];
-        assert_eq!(expected, hand.head_ranks_of_straight());
+        assert_eq!(&expected, hand.head_ranks_of_straight());
     }
 
     #[test]
@@ -581,7 +552,7 @@ mod test {
         let expected: Vec<CardRank> = vec![
             CardRank::new(8),
         ];
-        assert_eq!(expected, hand.head_ranks_of_straight());
+        assert_eq!(&expected, hand.head_ranks_of_straight());
     }
 
     #[test]
@@ -597,7 +568,7 @@ mod test {
         let expected: Vec<CardRank> = vec![
             CardRank::new(1),
         ];
-        assert_eq!(expected, hand.head_ranks_of_straight());
+        assert_eq!(&expected, hand.head_ranks_of_straight());
     }
 
     #[test]
@@ -613,7 +584,7 @@ mod test {
         let expected: Vec<CardRank> = vec![
             CardRank::new(5),
         ];
-        assert_eq!(expected, hand.head_ranks_of_straight());
+        assert_eq!(&expected, hand.head_ranks_of_straight());
     }
 
     #[test]
@@ -628,7 +599,7 @@ mod test {
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
         ];
-        assert_eq!(expected, hand.head_ranks_of_straight());
+        assert_eq!(&expected, hand.head_ranks_of_straight());
     }
 
     #[test]
@@ -643,7 +614,7 @@ mod test {
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
         ];
-        assert_eq!(expected, hand.head_ranks_of_straight());
+        assert_eq!(&expected, hand.head_ranks_of_straight());
     }
 
     #[test]
@@ -658,7 +629,7 @@ mod test {
         let hand = TotalHand::new(&cards);
         let expected: Vec<CardRank> = vec![
         ];
-        assert_eq!(expected, hand.head_ranks_of_straight());
+        assert_eq!(&expected, hand.head_ranks_of_straight());
     }
 
     #[test]
@@ -676,7 +647,7 @@ mod test {
             CardRank::new(7),
             CardRank::new(6),
         ];
-        assert_eq!(expected, hand.head_ranks_of_straight());
+        assert_eq!(&expected, hand.head_ranks_of_straight());
     }
 
     #[test]
@@ -696,44 +667,7 @@ mod test {
             CardRank::new(7),
             CardRank::new(6),
         ];
-        assert_eq!(expected, hand.head_ranks_of_straight());
-    }
-
-    #[test]
-    fn sequence_of_4_cards_is_open_end_straight_draw() {
-        let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(6)),
-            NonJokerCard::new(Suit::Heart, CardRank::new(5)),
-            NonJokerCard::new(Suit::Heart, CardRank::new(3)),
-            NonJokerCard::new(Suit::Club, CardRank::new(4)),
-        ];
-        let hand = TotalHand::new(&cards);
-        assert!(hand.is_open_end_straight_draw());
-    }
-
-    #[test]
-    fn open_end_straight_draw_with_extra_card() {
-        let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(8)),
-            NonJokerCard::new(Suit::Heart, CardRank::new(6)),
-            NonJokerCard::new(Suit::Heart, CardRank::new(5)),
-            NonJokerCard::new(Suit::Heart, CardRank::new(3)),
-            NonJokerCard::new(Suit::Club, CardRank::new(4)),
-        ];
-        let hand = TotalHand::new(&cards);
-        assert!(hand.is_open_end_straight_draw());
-    }
-
-    #[test]
-    fn gapped_sequence_of_4_cards_is_not_open_end_straight_draw() {
-        let cards = vec![
-            NonJokerCard::new(Suit::Heart, CardRank::new(6)),
-            NonJokerCard::new(Suit::Heart, CardRank::new(5)),
-            NonJokerCard::new(Suit::Heart, CardRank::new(2)),
-            NonJokerCard::new(Suit::Club, CardRank::new(4)),
-        ];
-        let hand = TotalHand::new(&cards);
-        assert!(!hand.is_open_end_straight_draw());
+        assert_eq!(&expected, hand.head_ranks_of_straight());
     }
 
     #[test]
@@ -758,5 +692,54 @@ mod test {
         ];
         let hand = TotalHand::new(&cards);
         assert!(!hand.is_flush_draw());
+    }
+
+    #[test]
+    fn open_end_straight_draw_has_2_draw_ranks() {
+        let cards = vec![
+            NonJokerCard::new(Suit::Heart, CardRank::new(6)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(5)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(3)),
+            NonJokerCard::new(Suit::Club, CardRank::new(4)),
+        ];
+        let hand = TotalHand::new(&cards);
+        let expected = [
+            CardRank::new(7),
+            CardRank::new(2),
+        ];
+        assert_eq!(&expected, hand.straight_draw_ranks());
+    }
+
+    #[test]
+    fn inside_straight_draw_has_1_draw_rank() {
+        let cards = vec![
+            NonJokerCard::new(Suit::Heart, CardRank::new(7)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(5)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(3)),
+            NonJokerCard::new(Suit::Club, CardRank::new(4)),
+        ];
+        let hand = TotalHand::new(&cards);
+        let expected = [
+            CardRank::new(6),
+        ];
+        assert_eq!(&expected, hand.straight_draw_ranks());
+    }
+
+    #[test]
+    fn not_open_end_straight_draw_but_has_2_draw_rank() {
+        let cards = vec![
+            NonJokerCard::new(Suit::Heart, CardRank::new(10)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(9)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(7)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(6)),
+            NonJokerCard::new(Suit::Heart, CardRank::new(3)),
+            NonJokerCard::new(Suit::Club, CardRank::new(4)),
+        ];
+        let hand = TotalHand::new(&cards);
+        let expected = [
+            CardRank::new(8),
+            CardRank::new(5),
+        ];
+        assert_eq!(&expected, hand.straight_draw_ranks());
     }
 }

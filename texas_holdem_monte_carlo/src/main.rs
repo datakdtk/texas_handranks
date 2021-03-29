@@ -13,7 +13,7 @@ use std::sync::mpsc;
 
 fn main() {
     let worker_count = 8;
-    let trial_per_worker = 500000;
+    let trial_per_worker = 500_000;
     let num_of_players = 6;
     
     let (tx, rx) = mpsc::channel();

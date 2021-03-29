@@ -13,9 +13,9 @@ pub(super) fn try_to_build_from_total_hand(hand: &TotalHand) -> Option<BestFiveH
 
     let mut card_vec: Vec<Option<&NonJokerCard>> = Vec::new();
     for head in head_ranks_of_straight {
-        let head_rank_int = if head == CardRank::Ace { 14 } else { head.to_int() };
+        let head_rank_int = if *head == CardRank::Ace { 14 } else { head.to_int() };
         let ranks = [
-            head,
+            *head,
             CardRank::new(head_rank_int - 1),
             CardRank::new(head_rank_int - 2),
             CardRank::new(head_rank_int - 3),

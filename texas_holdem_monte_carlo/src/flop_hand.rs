@@ -6,8 +6,12 @@ use texas_holdem::card::{ HandRank, StartingHand, TotalHand, };
 
 pub fn evaluate_hand(hand: StartingHand, flop: [NonJokerCard; 3]) -> bool {
     let greatest_flop_rank = flop.iter().max_by(|a, b| cmp_cards(**a, **b)).unwrap().rank();
-    // ok if starting hand is 2 overs
-    if cmp_card_ranks(hand.lower_card().rank(), greatest_flop_rank) >= Ordering::Greater {
+
+    let over_card_count = hand.both_cards().iter().filter(|c| 
+        cmp_card_ranks(c.rank(), greatest_flop_rank) != Ordering::Less
+    ).collect::<Vec<&NonJokerCard>>().len();
+
+    if over_card_count >= 2 {
         return true;
     }
 
@@ -19,7 +23,11 @@ pub fn evaluate_hand(hand: StartingHand, flop: [NonJokerCard; 3]) -> bool {
         flop[2],
     ]);
     
-    if total_hand.is_open_end_straight_draw() || total_hand.is_flush_draw() {
+    if total_hand.straight_draw_ranks().len() >= 2 || total_hand.is_flush_draw() {
+        return true;
+    }
+
+    if over_card_count == 1 && total_hand.straight_draw_ranks().len() == 1 {
         return true;
     }
     
